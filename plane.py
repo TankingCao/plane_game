@@ -1,6 +1,6 @@
 import random
-
 import pygame
+
 
 # 常量--------------------------------------
 # 屏幕常量
@@ -28,6 +28,9 @@ BULLET_SPEED_X = 15
 # 英雄子弹射速(越小射得越快，不能小于0)
 FIRE_RATE = 20
 
+# 图片文件前缀
+IMG = 'game\images\\'
+
 
 # -------------------------------------------
 
@@ -48,7 +51,7 @@ class GameSprite(pygame.sprite.Sprite):
 # 背景类
 class Background(GameSprite):
     def __init__(self, is_alt=False):
-        super().__init__('./images/background.png')
+        super().__init__(IMG + 'background.png')
         if is_alt:
             self.rect.y = -self.rect.height
 
@@ -62,7 +65,7 @@ class Background(GameSprite):
 class Enemy(GameSprite):
     def __init__(self, num):
         # 随机生成3种敌机类型
-        super().__init__('./images/enemy' + str(num) + '.png')
+        super().__init__(IMG + 'enemy' + str(num) + '.png')
         self.id = num  # 敌机类型
         self.speed = random.randint(1, 10)
         self.rect.bottom = 0
@@ -76,7 +79,7 @@ class Enemy(GameSprite):
             self.kill()
 
     def fire(self):
-        bullet = Bullet('./images/bullet1.png', speedy=ENEMY_BULLET_SPEED)
+        bullet = Bullet(IMG + 'bullet1.png', speedy=ENEMY_BULLET_SPEED)
         bullet.rect.centerx = self.rect.centerx
         bullet.rect.y = self.rect.bottom
         self.bullets.add(bullet)
@@ -86,7 +89,7 @@ class Enemy(GameSprite):
 class Hero(GameSprite):
 
     def __init__(self):
-        super().__init__('./images/me1.png', 0)
+        super().__init__(IMG+ 'me1.png', 0)
         self.rect.centerx = SCREEN_RECT.centerx
         self.rect.bottom = SCREEN_RECT.bottom - 120
         # 创建子弹精灵组
@@ -97,19 +100,19 @@ class Hero(GameSprite):
 
     def fire(self):
         # 中间子弹
-        bullet_mid = Bullet('./images/bomb.png')
+        bullet_mid = Bullet(IMG + 'bomb.png')
         bullet_mid.rect.bottom = self.rect.y + 20
         bullet_mid.rect.centerx = self.rect.centerx
-        bullet_mid_left = Bullet('./images/bomb.png', BULLET_SPEED_X)
+        bullet_mid_left = Bullet(IMG + 'bomb.png', BULLET_SPEED_X)
         bullet_mid_left.rect.bottom = self.rect.y + 20
         bullet_mid_left.rect.centerx = self.rect.centerx
-        bullet_mid_right = Bullet('./images/bomb.png', -BULLET_SPEED_X)
+        bullet_mid_right = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X)
         bullet_mid_right.rect.bottom = self.rect.y + 20
         bullet_mid_right.rect.centerx = self.rect.centerx
 
         # 两侧子弹
-        bullet_left = Bullet('./images/bomb.png', -BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
-        bullet_right = Bullet('./images/bomb.png', BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
+        bullet_left = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
+        bullet_right = Bullet(IMG + 'bomb.png', BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
         bullet_right.rect.bottom = self.rect.y + 51
         bullet_right.rect.centerx = self.rect.centerx + 32
         bullet_left.rect.bottom = self.rect.y + 51
