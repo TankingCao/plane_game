@@ -76,7 +76,6 @@ class PlaneGame:
         lst = pygame.sprite.groupcollide(self.hero.bullets, self.enemy_group, True, True, pygame.sprite.collide_mask)
         # 敌机撞毁英雄飞机
         enemies = pygame.sprite.spritecollide(self.hero, self.enemy_group, True, collided=pygame.sprite.collide_mask)
-        enemies = []
         enemies2 = []
         # 英雄子弹和敌机子弹抵消，敌机击毁英雄飞机
         for e in self.enemy_group.sprites():
