@@ -4,6 +4,8 @@ from plane import *
 
 
 class PlaneGame:
+    '''初始化'''
+
     def __init__(self):
         print('游戏初始化...')
         # 1.创建主窗口
@@ -18,6 +20,10 @@ class PlaneGame:
         pygame.time.set_timer(ENEMY_FIRE, ENEMY_FIRE_RATE)
         # 5.初始化变量
         self.destoried = 0  # 击败敌机数量
+        self.my_font = FONT  # 字体对象
+        self.kills = self.my_font.render('杀敌数:' + str(0), True, FONT_COLOR, None)  # 杀敌数
+
+    '''创建精灵和精灵组(游戏中的各种物品)'''
 
     def __create_sprites(self):
         # 创建背景精灵和背景精灵组
@@ -32,6 +38,8 @@ class PlaneGame:
         self.hero = Hero()
         self.hero_group = pygame.sprite.Group(self.hero)
 
+    '''开始游戏'''
+
     def start_game(self):
         print('开始游戏')
         while True:
@@ -39,9 +47,11 @@ class PlaneGame:
             self.__event_handler()
             self.__update_sprites()
             self.__check_collide()
+            self.__show_status_bar()
             pygame.display.update()
 
-    # 事件监听
+    '''事件监听'''
+
     def __event_handler(self):
         for event in pygame.event.get():
             # 判断是否退出游戏
@@ -59,27 +69,36 @@ class PlaneGame:
                 for i in self.enemy_group.sprites():
                     i.fire()
 
-    # 碰撞检测
+    '''碰撞检测'''
+
     def __check_collide(self):
         # 英雄飞机子弹销毁敌机
-        lst = pygame.sprite.groupcollide(self.hero.bullets, self.enemy_group, True, True)
+        lst = pygame.sprite.groupcollide(self.hero.bullets, self.enemy_group, True, True, pygame.sprite.collide_mask)
         # 敌机撞毁英雄飞机
-        enemies = pygame.sprite.spritecollide(self.hero, self.enemy_group, True)
+        enemies = pygame.sprite.spritecollide(self.hero, self.enemy_group, True, collided=pygame.sprite.collide_mask)
+        enemies = []
         enemies2 = []
         # 英雄子弹和敌机子弹抵消，敌机击毁英雄飞机
         for e in self.enemy_group.sprites():
-            pygame.sprite.groupcollide(self.hero.bullets, e.bullets, True, True)
-            enemies2 = pygame.sprite.spritecollide(self.hero, e.bullets, True)
+            pygame.sprite.groupcollide(self.hero.bullets, e.bullets, True, True, pygame.sprite.collide_mask)
+            enemies2 = pygame.sprite.spritecollide(self.hero, e.bullets, True, collided=pygame.sprite.collide_mask)
 
+        # 更新杀敌数
         self.destoried += len(lst)
-        print('敌机销毁数量:', self.destoried)
+        self.kills = self.my_font.render('杀敌数:' + str(self.destoried), True, FONT_COLOR, None)
 
         if enemies or enemies2:
             self.hero.kill()
             print('这都能挂?')
             self.__game_over()
 
-    # 更新精灵组
+    '''游戏状态显示'''
+
+    def __show_status_bar(self):
+        self.screen.blit(self.kills, (0, SCREEN_RECT.height - self.kills.get_rect().height))
+
+    '''更新精灵组'''
+
     def __update_sprites(self):
         self.back_group.update()
         self.back_group.draw(self.screen)
@@ -93,7 +112,8 @@ class PlaneGame:
         self.hero.bullets.update()
         self.hero.bullets.draw(self.screen)
 
-    # 结束游戏
+    '''结束游戏'''
+
     @staticmethod
     def __game_over():
         print('游戏结束')
@@ -101,6 +121,7 @@ class PlaneGame:
         exit(0)
 
 
+'''主函数'''
 if __name__ == '__main__':
     p = PlaneGame()
     p.start_game()
