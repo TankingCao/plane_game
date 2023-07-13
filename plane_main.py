@@ -1,11 +1,11 @@
+import time
+
 import pygame.event
 
 from plane import *
 
 
 class PlaneGame:
-    '''初始化'''
-
     def __init__(self):
         print('游戏初始化...')
         # 1.创建主窗口
@@ -85,10 +85,19 @@ class PlaneGame:
         # 更新杀敌数
         self.destoried += len(lst)
         self.kills = self.my_font.render('杀敌数:' + str(self.destoried), True, FONT_COLOR, None)
+        if self.destoried >= 10:
+            bullet_mid_left = Bullet(IMG + 'bomb.png', BULLET_SPEED_X)
+            bullet_mid_left.rect.bottom = self.hero.rect.y + 20
+            bullet_mid_left.rect.centerx = self.hero.rect.centerx
+            bullet_mid_right = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X)
+            bullet_mid_right.rect.bottom = self.hero.rect.y + 20
+            bullet_mid_right.rect.centerx = self.hero.rect.centerx
+            self.hero.bullets.add(bullet_mid_right, bullet_mid_left)
 
         if enemies or enemies2:
             self.hero.kill()
-            print('这都能挂?')
+            AIYO.play()
+            time.sleep(1)
             self.__game_over()
 
     '''游戏状态显示'''
@@ -122,5 +131,4 @@ class PlaneGame:
 
 '''主函数'''
 if __name__ == '__main__':
-    p = PlaneGame()
-    p.start_game()
+    PlaneGame().start_game()

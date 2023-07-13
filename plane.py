@@ -1,8 +1,9 @@
 import random
-import pygame
-import warnings
 
-warnings.filterwarnings("ignore", category=RuntimeWarning, message=".*iCCP: known incorrect sRGB profile.*")
+import pygame
+
+pygame.init()
+pygame.font.init()
 
 # 常量--------------------------------------
 # 屏幕常量
@@ -10,7 +11,6 @@ SCREEN_RECT = pygame.Rect(0, 0, 480, 700)
 # 帧率
 FRAME = 60
 
-pygame.font.init()
 # 字体样式和大小
 FONT = pygame.font.SysFont('Microsoft YaHei', 20)
 # 字体颜色rgb
@@ -23,20 +23,24 @@ BULLET_SPEED_Y = 30
 BULLET_SPEED_X = 15
 # 英雄子弹射速(负相关)
 FIRE_RATE = 20
+# 英雄爆炸音效
+AIYO = pygame.mixer.Sound('voice/aiyo.mp3')
 
 # 创建敌机的定时器常量
 CREATE_ENEMY = pygame.USEREVENT
 # 敌机生成速度(-)
-ENEMY_RATE = 50
+ENEMY_RATE = 500
 # 敌机发射子弹事件
 ENEMY_FIRE = pygame.USEREVENT + 2
 # 敌机子弹射速(-)
 ENEMY_FIRE_RATE = 300
 # 敌机子弹速度(+)
-ENEMY_BULLET_SPEED = 10
+ENEMY_BULLET_SPEED = random.randint(5,20)
+# 敌机爆炸音效
+EXPLOSION = pygame.mixer.Sound('voice\\bong.mp3')
 
 # 图片文件前缀
-IMG = r'images\\'
+IMG = r'images/'
 
 
 # -------------------------------------------
@@ -96,6 +100,14 @@ class Enemy(GameSprite):
         bullet.rect.y = self.rect.bottom
         self.bullets.add(bullet)
 
+    def __del__(self):
+        for i in range(30):
+            self.image = pygame.image.load('images/enemy1_down1.png')
+        for i in range(30):
+            self.image = pygame.image.load('images/enemy1_down2.png')
+        EXPLOSION.play()
+
+
 
 # 英雄飞机类
 class Hero(GameSprite):
@@ -115,22 +127,23 @@ class Hero(GameSprite):
         bullet_mid = Bullet(IMG + 'bomb.png')
         bullet_mid.rect.bottom = self.rect.y + 20
         bullet_mid.rect.centerx = self.rect.centerx
-        bullet_mid_left = Bullet(IMG + 'bomb.png', BULLET_SPEED_X)
-        bullet_mid_left.rect.bottom = self.rect.y + 20
-        bullet_mid_left.rect.centerx = self.rect.centerx
-        bullet_mid_right = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X)
-        bullet_mid_right.rect.bottom = self.rect.y + 20
-        bullet_mid_right.rect.centerx = self.rect.centerx
+        # bullet_mid_left = Bullet(IMG + 'bomb.png', BULLET_SPEED_X)
+        # bullet_mid_left.rect.bottom = self.rect.y + 20
+        # bullet_mid_left.rect.centerx = self.rect.centerx
+        # bullet_mid_right = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X)
+        # bullet_mid_right.rect.bottom = self.rect.y + 20
+        # bullet_mid_right.rect.centerx = self.rect.centerx
 
-        # 两侧子弹
-        bullet_left = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
-        bullet_right = Bullet(IMG + 'bomb.png', BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
-        bullet_right.rect.bottom = self.rect.y + 51
-        bullet_right.rect.centerx = self.rect.centerx + 32
-        bullet_left.rect.bottom = self.rect.y + 51
-        bullet_left.rect.centerx = self.rect.centerx - 32
+        # # 两侧子弹
+        # bullet_left = Bullet(IMG + 'bomb.png', -BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
+        # bullet_right = Bullet(IMG + 'bomb.png', BULLET_SPEED_X, speedy=int(-BULLET_SPEED_Y / 2), rebound=True)
+        # bullet_right.rect.bottom = self.rect.y + 51
+        # bullet_right.rect.centerx = self.rect.centerx + 32
+        # bullet_left.rect.bottom = self.rect.y + 51
+        # bullet_left.rect.centerx = self.rect.centerx - 32
 
-        self.bullets.add(bullet_mid, bullet_right, bullet_left, bullet_mid_right, bullet_mid_left)
+        # self.bullets.add(bullet_mid, bullet_right, bullet_left, bullet_mid_right, bullet_mid_left)
+        self.bullets.add(bullet_mid)
 
 
 # 子弹类
@@ -150,7 +163,3 @@ class Bullet(GameSprite):
         if self.rebound:
             if self.rect.x < 0 or self.rect.x > SCREEN_RECT.width:
                 self.speedx = -self.speedx
-
-    def __del__(self):
-        pass
-        # print('子弹销毁')
